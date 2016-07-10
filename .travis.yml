@@ -1,8 +1,5 @@
 sudo: required
+dist: trusty
 services:
   - docker
-language: go
-go:
-  - tip
-install: make
 script: make build
