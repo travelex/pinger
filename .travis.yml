@@ -1,5 +1,7 @@
 language: go
 go:
   - tip
+services:
+  - docker
 install: make
 script: make build
