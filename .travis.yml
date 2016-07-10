@@ -1,6 +1,6 @@
 sudo: required
-dist: trusty
+language: go
 services:
   - docker
-install: docker.io
-script: make build
+script:
+  - make build
