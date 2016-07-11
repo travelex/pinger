@@ -10,7 +10,7 @@ Used for when your scalable stateless microservice needs to use an async third-p
 Edit the Dockerfile to set the environment variables:
 
   * TARGET_URL
-  * METHOD (currently only POST)
+  * METHOD (e.g. POST)
   * INTERVAL (in seconds)
 
 Then run
@@ -25,4 +25,8 @@ Plug this container into your composure, with a scale factor of 1.
 
 The single instance of pinger will call out to your microservice endpoint, directed by your load-balancer to one instance of the service, which can then do whatever logic is needed to handle state-change on your 3rd party.
 
-Currently only supports empty POST requests. Other methods will be added soon.
+Currently sends a body of
+
+    {}
+
+in the HTTP request (i.e. empty JSON body).
