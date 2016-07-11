@@ -24,4 +24,4 @@ RUN go get github.com/tools/godep
 RUN mkdir -p /gopath/src/github.com/johnpeterharvey/pinger
 WORKDIR /gopath/src/github.com/johnpeterharvey/pinger
 ENV CGO_ENABLED=0
-CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output pinger
+CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "pinger"
