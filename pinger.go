@@ -20,17 +20,22 @@ func main() {
     os.Exit(1)
   }
 
+  client := &http.Client{}
+
   for {
     log.Printf("Trying HTTP %s to %s", method, target)
-    if strings.ToUpper(method) == "POST" {
-      resp, err := http.Post(target, "application/json", strings.NewReader("{}"))
-      if err != nil {
-        log.Printf("Error! Received error while contacting target! %s", err)
-      } else {
-        log.Printf("Received response %d\n", resp.StatusCode)
-        if resp.StatusCode != 200 {
-          log.Printf("Error! Received unexpected status code from target! %d - %s", resp.StatusCode, err)
-        }
+
+    req, _ := http.NewRequest(method, target, strings.NewReader("{}"))
+    req.Header.Add("Accept", "application/json")
+    req.Header.Add("Content-Type", "application/json")
+    resp, err := client.Do(req)
+
+    if err != nil {
+      log.Printf("Error! Received error while contacting target! %s", err)
+    } else {
+      log.Printf("Received response %d\n", resp.StatusCode)
+      if resp.StatusCode != 200 {
+        log.Printf("Error! Received unexpected status code from target! %d - %s", resp.StatusCode, err)
       }
     }
 
