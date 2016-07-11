@@ -34,7 +34,7 @@ func main() {
       log.Printf("Error! Received error while contacting target! %s", err)
     } else {
       log.Printf("Received response %d\n", resp.StatusCode)
-      if resp.StatusCode != 200 {
+      if resp.StatusCode < 200 || resp.StatusCode >= 300 {
         log.Printf("Error! Received unexpected status code from target! %d - %s", resp.StatusCode, err)
       }
     }
