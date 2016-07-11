@@ -24,10 +24,13 @@ func main() {
     log.Printf("Trying HTTP %s to %s", method, target)
     if strings.ToUpper(method) == "POST" {
       resp, err := http.Post(target, "application/json", strings.NewReader("{}"))
-
-      log.Printf("Received response %d\n", resp.StatusCode)
-      if resp.StatusCode != 200 {
-        log.Printf("Error! Received unexpected status code from target! %d - %s", resp.StatusCode, err)
+      if err != nil {
+        log.Printf("Error! Received error while contacting target! %s", err)
+      } else {
+        log.Printf("Received response %d\n", resp.StatusCode)
+        if resp.StatusCode != 200 {
+          log.Printf("Error! Received unexpected status code from target! %d - %s", resp.StatusCode, err)
+        }
       }
     }
 
