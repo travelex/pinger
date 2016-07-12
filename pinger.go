@@ -29,6 +29,7 @@ func main() {
     req.Header.Add("Accept", "application/json")
     req.Header.Add("Content-Type", "application/json")
     resp, err := client.Do(req)
+    defer resp.Body.Close()
 
     if err != nil {
       log.Printf("Error! Received error while contacting target! %s", err)
