@@ -29,7 +29,6 @@ func main() {
     req.Header.Add("Accept", "application/json")
     req.Header.Add("Content-Type", "application/json")
     resp, err := client.Do(req)
-    defer resp.Body.Close()
 
     if err != nil {
       log.Printf("Error! Received error while contacting target! %s", err)
@@ -38,6 +37,7 @@ func main() {
       if resp.StatusCode < 200 || resp.StatusCode >= 300 {
         log.Printf("Error! Received unexpected status code from target! %d - %s", resp.StatusCode, err)
       }
+      defer resp.Body.Close()
     }
 
     log.Printf("Sleeping for %d seconds", interval)
