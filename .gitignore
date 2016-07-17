@@ -25,7 +25,4 @@ _testmain.go
 
 bin/
 
-# Compiled output
-pinger
-
 src/github.com/stretchr
