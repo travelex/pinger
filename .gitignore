@@ -24,6 +24,7 @@ _testmain.go
 *.prof
 
 bin/
+pkg/
 
 src/github.com/mitchellh
 src/github.com/stretchr
