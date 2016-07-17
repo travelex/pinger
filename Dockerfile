@@ -1,5 +1,5 @@
 FROM scratch
-COPY pinger /
+COPY bin/pinger /
 ENV TARGET_URL  http://localhost
 ENV METHOD      POST
 ENV INTERVAL    60
