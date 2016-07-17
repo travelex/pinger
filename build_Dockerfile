@@ -13,7 +13,7 @@ ENV GOVERSION 1.6.2
 ENV GOPATH /gopath
 ENV GOROOT /goroot
 
-RUN mkdir /goroot && mkdir /gopath
+RUN mkdir /goroot && mkdir /gopath && mkdir /gopath/{bin,pkg,src}
 
 WORKDIR /gopath
 RUN curl https://storage.googleapis.com/golang/go${GOVERSION}.linux-amd64.tar.gz \
@@ -25,4 +25,4 @@ RUN go get github.com/mitchellh/gox
 RUN go get github.com/tools/godep
 
 ENV CGO_ENABLED=0
-CMD $GOPATH/bin/gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "bin/pinger" github.com/johnpeterharvey/pinger
+CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "bin/pinger" github.com/johnpeterharvey/pinger
