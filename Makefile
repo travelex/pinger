@@ -2,7 +2,7 @@ default: build
 
 build: clean
 		 docker build -f build_Dockerfile -t build:latest . \
-	&& docker run --rm -v "$(CURDIR):/gopath/src/github.com/johnpeterharvey/pinger:rw" build:latest \
+	&& docker run --rm -v "$(CURDIR)/src/github.com/johnpeterharvey/pinger:/gopath/src/github.com/johnpeterharvey/pinger:rw" build:latest \
 	&& docker build -t pinger:latest .
 
 run:

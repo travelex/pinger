@@ -23,5 +23,9 @@ _testmain.go
 *.test
 *.prof
 
+bin/
+
 # Compiled output
 pinger
+
+src/github.com/stretchr
