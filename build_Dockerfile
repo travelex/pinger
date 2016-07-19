@@ -9,7 +9,7 @@ RUN apt-get update -y \
            git mercurial \
  && rm -rf /var/lib/apt/lists/*
 
-ENV GOVERSION 1.6.2
+ENV GOVERSION 1.6.3
 ENV GOPATH /gopath
 ENV GOROOT /goroot
 
@@ -25,4 +25,4 @@ RUN go get github.com/mitchellh/gox
 RUN go get github.com/tools/godep
 
 ENV CGO_ENABLED=0
-CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "bin/pinger" github.com/johnpeterharvey/pinger
+CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "src/github.com/johnpeterharvey/pinger/pinger" github.com/johnpeterharvey/pinger
