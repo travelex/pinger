@@ -4,3 +4,4 @@ services:
   - docker
 script:
   - make build
+  - go test github.com/johnpeterharvey/pinger
