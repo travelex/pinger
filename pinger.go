@@ -1,6 +1,7 @@
 package main // import "github.com/johnpeterharvey/pinger"
 
 import (
+  "errors"
   "log"
   "net/http"
   "os"
@@ -12,7 +13,11 @@ import (
 func main() {
   log.Print("Starting up...")
 
-  interval, settings := GetSettings()
+  interval, settings, err := GetSettings()
+  if err != nil {
+    log.Print(err)
+    os.Exit(1)
+  }
 
   client := &http.Client{}
 
@@ -24,19 +29,19 @@ func main() {
   log.Printf("Exiting\n")
 }
 
-func GetSettings() (int, map[string]string) {
+func GetSettings() (int, map[string]string, error) {
   target := os.Getenv("TARGET_URL")
   method := os.Getenv("METHOD")
   interval, err := strconv.Atoi(os.Getenv("INTERVAL"))
 
   if target == "" || method == "" || err != nil {
-    log.Printf("Environment variables were not set, exiting")
-    os.Exit(1)
+    return -1, map[string]string{}, errors.New("Environment variables were not set, returning error")
   }
 
   return interval, map[string]string{
     "target": target,
-    "method": method}
+    "method": method},
+    nil
 }
 
 func DoCall(client *http.Client, settings map[string]string) {
