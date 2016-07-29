@@ -1,6 +1,7 @@
 # pinger
 
-[![Build Status](https://travis-ci.org/johnpeterharvey/pinger.svg?branch=master)](https://travis-ci.org/johnpeterharvey/pinger)
+[![Build Status Develop](https://travis-ci.org/johnpeterharvey/pinger.svg?branch=develop)](https://travis-ci.org/johnpeterharvey/pinger)
+[![Build Status Master](https://travis-ci.org/johnpeterharvey/pinger.svg?branch=master)](https://travis-ci.org/johnpeterharvey/pinger)
 
 Builds a small (~5MB) Docker container that calls out to an HTTP endpoint on an interval.
 
