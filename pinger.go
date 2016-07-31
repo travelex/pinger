@@ -34,7 +34,7 @@ func GetSettings() (int, map[string]string, error) {
   method := os.Getenv("METHOD")
   interval, err := strconv.Atoi(os.Getenv("INTERVAL"))
 
-  if target == "" || method == "" || err != nil {
+  if target == "" || method == "" || err != nil || interval < 0 {
     return -1, map[string]string{}, errors.New("Environment variables were not set, returning error")
   }
 
