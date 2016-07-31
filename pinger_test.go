@@ -1,10 +1,12 @@
 package main_test
 
 import (
+  "net/http"
   "os"
   "testing"
   "github.com/johnpeterharvey/pinger"
   "github.com/stretchr/testify/assert"
+  "github.com/stretchr/testify/mock"
 )
 
 func TestShouldFailWhenEnvVarsNotSet(t *testing.T) {
@@ -86,4 +88,29 @@ func TestShouldReturnSensibleWhenEnvVarsSet(t *testing.T) {
   assert.Equal(t, 30, interval, "Settings should have fetched")
   assert.Equal(t, "method", settings["method"], "Method should be set")
   assert.Equal(t, "test url", settings["target"], "Target should be set")
+}
+
+type http.Client struct {
+  mock.Mock
+}
+
+func (client http.Client) Do(request http.Request) (http.Response, error) {
+  return http.Response{}, nil
+}
+
+//
+// func TestShouldHandleHTTPFailure(t *testing.T) {
+//
+// }
+
+func TestShouldHandleHTTPSuccess(t *testing.T) {
+  // Given
+  settings := map[string]string{
+    "target": "test target",
+    "method": "test method"}
+  testClient := new(http.Client)
+  // When
+  main.DoCall(testClient, settings)
+
+  // Then
 }
