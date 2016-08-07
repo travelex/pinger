@@ -2,6 +2,7 @@ package main // import "github.com/johnpeterharvey/pinger"
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -22,7 +23,10 @@ func main() {
 	client := &http.Client{}
 
 	for {
-		DoCall(client, settings)
+		err := DoCall(client, settings)
+		if err != nil {
+			log.Print(err)
+		}
 		log.Printf("Sleeping for %d seconds", interval)
 		time.Sleep(time.Duration(interval) * time.Second)
 	}
@@ -45,21 +49,25 @@ func GetSettings() (int, map[string]string, error) {
 }
 
 // DoCall Do an HTTP call out to the server, with the specified properties
-func DoCall(client *http.Client, settings map[string]string) {
+func DoCall(client *http.Client, settings map[string]string) error {
 	log.Printf("Trying HTTP %s to %s", settings["method"], settings["target"])
 
-	req, _ := http.NewRequest(settings["method"], settings["target"], strings.NewReader("{}"))
+	req, err := http.NewRequest(settings["method"], settings["target"], strings.NewReader("{}"))
+	if err != nil {
+		return errors.New(fmt.Sprintf("Failed to create HTTP request! %s", err))
+	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := client.Do(req)
+	defer resp.Body.Close()
 
 	if err != nil {
-		log.Printf("Error! Received error while contacting target! %s", err)
+		return errors.New(fmt.Sprintf("Error! Received error while contacting target! %s", err))
 	} else {
 		log.Printf("Received response %d\n", resp.StatusCode)
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-			log.Printf("Error! Received unexpected status code from target! %d", resp.StatusCode)
+			return errors.New(fmt.Sprintf("Error! Received unexpected status code from target! %d", resp.StatusCode))
 		}
-		defer resp.Body.Close()
 	}
+	return nil
 }
