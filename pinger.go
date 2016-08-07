@@ -54,7 +54,7 @@ func DoCall(client *http.Client, settings map[string]string) error {
 
 	req, err := http.NewRequest(settings["method"], settings["target"], strings.NewReader("{}"))
 	if err != nil {
-		return errors.New(fmt.Sprintf("Failed to create HTTP request! %s", err))
+		return fmt.Errorf("Failed to create HTTP request! %s", err)
 	}
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
@@ -62,12 +62,11 @@ func DoCall(client *http.Client, settings map[string]string) error {
 	defer resp.Body.Close()
 
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error! Received error while contacting target! %s", err))
-	} else {
-		log.Printf("Received response %d\n", resp.StatusCode)
-		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-			return errors.New(fmt.Sprintf("Error! Received unexpected status code from target! %d", resp.StatusCode))
-		}
+		return fmt.Errorf("Error! Received error while contacting target! %s", err)
+	}
+	log.Printf("Received response %d\n", resp.StatusCode)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("Error! Received unexpected status code from target! %d", resp.StatusCode)
 	}
 	return nil
 }
