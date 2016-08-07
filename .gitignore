@@ -23,5 +23,7 @@ _testmain.go
 *.test
 *.prof
 
-# Compiled output
+bin/
+pkg/
+
 pinger

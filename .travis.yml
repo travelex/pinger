@@ -4,3 +4,5 @@ services:
   - docker
 script:
   - make build
+  - go get github.com/stretchr/testify/assert
+  - go test github.com/johnpeterharvey/pinger

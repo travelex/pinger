@@ -9,19 +9,18 @@ RUN apt-get update -y \
            git mercurial \
  && rm -rf /var/lib/apt/lists/*
 
-ENV GOVERSION 1.6.2
 RUN mkdir /goroot && mkdir /gopath
+
+ENV GOVERSION   1.6.3
+ENV GOPATH      /gopath
+ENV GOROOT      /goroot
+ENV PATH        $GOROOT/bin:$GOPATH/bin:$PATH
+ENV CGO_ENABLED 0
+
+WORKDIR /gopath
 RUN curl https://storage.googleapis.com/golang/go${GOVERSION}.linux-amd64.tar.gz \
    | tar xvzf - -C /goroot --strip-components=1
 
-ENV GOPATH /gopath
-ENV GOROOT /goroot
-ENV PATH $GOROOT/bin:$GOPATH/bin:$PATH
-
 RUN go get github.com/mitchellh/gox
-RUN go get github.com/tools/godep
 
-RUN mkdir -p /gopath/src/github.com/johnpeterharvey/pinger
-WORKDIR /gopath/src/github.com/johnpeterharvey/pinger
-ENV CGO_ENABLED=0
-CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "pinger"
+CMD gox -os=linux -arch=amd64 -ldflags='-extldflags "-static"' -output "src/github.com/johnpeterharvey/pinger/pinger" github.com/johnpeterharvey/pinger
