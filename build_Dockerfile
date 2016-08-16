@@ -11,7 +11,7 @@ RUN apt-get update -y \
 
 RUN mkdir /goroot && mkdir /gopath
 
-ENV GOVERSION   1.6.3
+ENV GOVERSION   1.7
 ENV GOPATH      /gopath
 ENV GOROOT      /goroot
 ENV PATH        $GOROOT/bin:$GOPATH/bin:$PATH
