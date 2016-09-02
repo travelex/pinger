@@ -91,7 +91,7 @@ func DoCall(client *http.Client, settings map[string]string) error {
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := client.Do(req)
-	//defer resp.Body.Close()
+	defer resp.Body.Close()
 
 	if err != nil {
 		return fmt.Errorf("Error! Received error while contacting target! %s", err)
