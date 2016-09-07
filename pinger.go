@@ -14,7 +14,7 @@ import (
 func main() {
 	log.Print("Starting up...")
 
-	interval, settings, timeToRun, err := GetSettings()
+	interval, settings, timeToRun, loc, err := GetSettings()
 
 	if err != nil {
 		log.Print(err)
@@ -24,6 +24,7 @@ func main() {
 	client := &http.Client{}
 
 	if time.Time.IsZero(timeToRun) {
+		// run ping on fixed interval only
 		for {
 			err := DoCall(client, settings)
 			if err != nil {
@@ -34,10 +35,11 @@ func main() {
 		}
 	} else {
 		for {
-			duration := GetDurationToWait(interval, timeToRun)
+			// run ping at fixed time
+			duration := GetDurationToWait(interval, timeToRun, loc)
 			log.Printf("Sleeping for %f seconds", duration.Seconds())
 			time.Sleep(duration)
-			err := DoCall(client, settings)
+			err = DoCall(client, settings)
 			if err != nil {
 				log.Print(err)
 			}
@@ -45,38 +47,46 @@ func main() {
 	}
 }
 
-//GetDurationToWait Get duration till next run
-func GetDurationToWait(interval int, timeToRun time.Time) time.Duration {
-	now := time.Now().UTC()
-	nextRun := time.Date(now.Year(), now.Month(), now.Day(), timeToRun.Hour(), timeToRun.Minute(), timeToRun.Second(), 0, time.UTC)
+// GetDurationToWait Get duration till next run
+func GetDurationToWait(interval int, timeToRun time.Time, timezone *time.Location) time.Duration {
+	now := time.Now().In(timezone)
+	nextRun := time.Date(now.Year(), now.Month(), now.Day(), timeToRun.Hour(), timeToRun.Minute(), timeToRun.Second(), 0, timezone)
 
 	if !nextRun.After(now) {
-		nextRun = nextRun.Add(time.Duration(interval) * time.Second)
+		nextRun = time.Date(now.Year(), now.Month(), now.Day() + 1, timeToRun.Hour(), timeToRun.Minute(), timeToRun.Second(), 0, timezone)
 	}
 
 	return nextRun.Sub(now)
 }
 
 // GetSettings Read required settings from environment variables
-func GetSettings() (int, map[string]string, time.Time,  error) {
+func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
 	target := os.Getenv("TARGET_URL")
 	method := os.Getenv("METHOD")
 	interval, err1 := strconv.Atoi(os.Getenv("INTERVAL"))
 
 	timeToRun := time.Time{}
-	var err2 error
+	var errTime error
 	if os.Getenv("TIME") != "" {
-		timeToRun, err2 = time.Parse("15:04:05", os.Getenv("TIME"))
+		timeToRun, errTime = time.Parse("15:04:05", os.Getenv("TIME"))
 	}
 
-	if target == "" || method == "" || err1 != nil || err2 != nil || interval < 0 {
-		return -1, map[string]string{}, timeToRun, errors.New("Environment variables were not set, returning error")
+	loc := time.UTC
+	var errTimezone error
+	if os.Getenv("TIMEZONE") != "" {
+		loc, errTimezone = time.LoadLocation(os.Getenv("TIMEZONE"))
+	}
+
+	if target == "" || method == "" || err1 != nil || errTime != nil || errTimezone != nil || interval < 0 {
+		return -1, map[string]string{}, timeToRun, loc,
+			errors.New("Environment variables were not set or could not be parsed, returning error")
 	}
 
 	return interval, map[string]string{
 			"target": target,
 			"method": method},
 		timeToRun,
+		loc,
 		nil
 }
 
