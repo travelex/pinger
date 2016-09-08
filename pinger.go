@@ -78,7 +78,7 @@ func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
 	}
 
 	if target == "" || method == "" || err1 != nil || errTime != nil || errTimezone != nil || interval < 0 {
-		return -1, map[string]string{}, timeToRun, loc,
+		return -1, map[string]string{}, timeToRun, time.UTC,
 			errors.New("Environment variables were not set or could not be parsed, returning error")
 	}
 
