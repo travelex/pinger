@@ -13,6 +13,8 @@ Edit the Dockerfile to set the environment variables:
   * TARGET_URL
   * METHOD (e.g. POST)
   * INTERVAL (in seconds)
+  * TIME (optional, e.g. 16:37:00)
+  * TIMEZONE (optional, e.g. Europe/London)
 
 Then run
 
