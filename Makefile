@@ -2,7 +2,8 @@ default: build
 
 build: clean
 	docker build -f build_Dockerfile -t build:latest . \
-	&& docker run --rm -v "$(CURDIR):/gopath/src/github.com/travelex/pinger:rw" build:latest \
+	&& docker run --rm -v "$(CURDIR):/gopath/src/github.com/johnpeterharvey/pinger:rw" build:latest \
+	&& tar cfz zoneinfo.tar.gz /usr/share/zoneinfo \
 	&& docker build -t pinger:latest .
 
 run:
