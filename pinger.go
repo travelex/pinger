@@ -62,24 +62,29 @@ func GetDurationToWait(timeToRun time.Time, timezone *time.Location) time.Durati
 // GetSettings Read required settings from environment variables
 func GetSettings() (int, map[string]string, time.Time, *time.Location, error) {
 	target := os.Getenv("TARGET_URL")
+	log.Printf("[Setting] Target: %s", target)
 	method := os.Getenv("METHOD")
+	log.Printf("[Setting] Method: %s", method)
 
-	var interval int
+	interval := 0
 	var errInterval error
 	if os.Getenv("INTERVAL") != "" {
 		interval, errInterval = strconv.Atoi(os.Getenv("INTERVAL"))
+		log.Printf("[Setting] Interval: %d", interval)
 	}
 
 	timeToRun := time.Time{}
 	var errTime error
 	if os.Getenv("TIME") != "" {
 		timeToRun, errTime = time.Parse("15:04:05", os.Getenv("TIME"))
+		log.Printf("[Setting] Time: %s", timeToRun.Format("15:04:05"))
 	}
 
-	loc := time.UTC
+	timeZone := time.UTC
 	var errTimezone error
 	if os.Getenv("TIMEZONE") != "" {
-		loc, errTimezone = time.LoadLocation(os.Getenv("TIMEZONE"))
+		timeZone, errTimezone = time.LoadLocation(os.Getenv("TIMEZONE"))
+		log.Printf("[Setting] Timezone: %s", timeZone)
 	}
 
 	if target == "" || method == "" || errInterval != nil || errTime != nil || errTimezone != nil || interval < 0 {
@@ -90,7 +95,7 @@ func GetSettings() (int, map[string]string, time.Time, *time.Location, error) {
 			"target": target,
 			"method": method},
 		timeToRun,
-		loc,
+		timeZone,
 		nil
 }
 
