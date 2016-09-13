@@ -2,26 +2,28 @@ FROM debian:jessie
 
 RUN apt-get update -y \
  && apt-get install --no-install-recommends -y -q \
-           curl \
-           zip \
            build-essential \
            ca-certificates \
-           git mercurial \
+           curl \
+           git \
+           mercurial \
+           zip \
  && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir /goroot && mkdir /gopath
+RUN mkdir /goroot /gopath
 
 ENV GOVERSION   1.7.1
 ENV GOPATH      /gopath
 ENV GOROOT      /goroot
 ENV PATH        $GOROOT/bin:$GOPATH/bin:$PATH
 ENV CGO_ENABLED 0
-ENV GOX_LDFLAGS -extldflags '-static'
+ENV GOOS        linux
+ENV GOARCH      amd64
 
-WORKDIR /gopath
 RUN curl https://storage.googleapis.com/golang/go${GOVERSION}.linux-amd64.tar.gz \
-   | tar xvzf - -C /goroot --strip-components=1
+  | tar xvzf - -C /goroot --strip-components=1
 
-RUN go get github.com/mitchellh/gox
+WORKDIR /gopath/src/github.com/johnpeterharvey/pinger
+ADD compile.sh /
 
-ENTRYPOINT ["gox", "-os=linux", "-arch=amd64", "-output=src/github.com/johnpeterharvey/pinger/pinger", "github.com/johnpeterharvey/pinger"]
+ENTRYPOINT ["bash", "-c", "/compile.sh"]

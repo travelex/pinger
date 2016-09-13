@@ -14,7 +14,7 @@ import (
 func main() {
 	log.Print("Starting up...")
 
-	interval, settings, timeToRun, loc, err := GetSettings()
+	interval, settings, timeToRun, location, err := GetSettings()
 
 	if err != nil {
 		log.Print(err)
@@ -24,19 +24,19 @@ func main() {
 	client := &http.Client{}
 
 	if time.Time.IsZero(timeToRun) {
-		// run ping on fixed interval only
+		// Run pinger on a fixed interval
 		for {
+			log.Printf("Sleeping for %d seconds", interval)
+			time.Sleep(time.Duration(interval) * time.Second)
 			err := DoCall(client, settings)
 			if err != nil {
 				log.Print(err)
 			}
-			log.Printf("Sleeping for %d seconds", interval)
-			time.Sleep(time.Duration(interval) * time.Second)
 		}
 	} else {
 		for {
-			// run ping at fixed time
-			duration := GetDurationToWait(interval, timeToRun, loc)
+			// Run pinger at a specific time of day
+			duration := GetDurationToWait(timeToRun, location)
 			log.Printf("Sleeping for %f seconds", duration.Seconds())
 			time.Sleep(duration)
 			err = DoCall(client, settings)
@@ -47,23 +47,28 @@ func main() {
 	}
 }
 
-// GetDurationToWait Get duration till next run
-func GetDurationToWait(interval int, timeToRun time.Time, timezone *time.Location) time.Duration {
+// GetDurationToWait Get duration to sleep until next run
+func GetDurationToWait(timeToRun time.Time, timezone *time.Location) time.Duration {
 	now := time.Now().In(timezone)
 	nextRun := time.Date(now.Year(), now.Month(), now.Day(), timeToRun.Hour(), timeToRun.Minute(), timeToRun.Second(), 0, timezone)
 
 	if !nextRun.After(now) {
-		nextRun = time.Date(now.Year(), now.Month(), now.Day() + 1, timeToRun.Hour(), timeToRun.Minute(), timeToRun.Second(), 0, timezone)
+		nextRun = time.Date(now.Year(), now.Month(), now.Day()+1, timeToRun.Hour(), timeToRun.Minute(), timeToRun.Second(), 0, timezone)
 	}
 
 	return nextRun.Sub(now)
 }
 
 // GetSettings Read required settings from environment variables
-func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
+func GetSettings() (int, map[string]string, time.Time, *time.Location, error) {
 	target := os.Getenv("TARGET_URL")
 	method := os.Getenv("METHOD")
-	interval, err1 := strconv.Atoi(os.Getenv("INTERVAL"))
+
+	var interval int
+	var errInterval error
+	if os.Getenv("INTERVAL") != "" {
+		interval, errInterval = strconv.Atoi(os.Getenv("INTERVAL"))
+	}
 
 	timeToRun := time.Time{}
 	var errTime error
@@ -77,9 +82,8 @@ func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
 		loc, errTimezone = time.LoadLocation(os.Getenv("TIMEZONE"))
 	}
 
-	if target == "" || method == "" || err1 != nil || errTime != nil || errTimezone != nil || interval < 0 {
-		return -1, map[string]string{}, timeToRun, time.UTC,
-			errors.New("Environment variables were not set or could not be parsed, returning error")
+	if target == "" || method == "" || errInterval != nil || errTime != nil || errTimezone != nil || interval < 0 {
+		return -1, map[string]string{}, time.Time{}, nil, errors.New("Environment variables were not set or could not be parsed, returning error")
 	}
 
 	return interval, map[string]string{

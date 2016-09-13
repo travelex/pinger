@@ -23,7 +23,10 @@ _testmain.go
 *.test
 *.prof
 
+.DS_Store
+
 bin/
 pkg/
 
 pinger
+zoneinfo.zip

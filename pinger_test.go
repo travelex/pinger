@@ -7,8 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestShouldFailWhenEnvVarsNotSet(t *testing.T) {
@@ -21,7 +22,7 @@ func TestShouldFailWhenEnvVarsNotSet(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 }
 
 func TestShouldFailWhenNotAllEnvVarsSet(t *testing.T) {
@@ -35,7 +36,7 @@ func TestShouldFailWhenNotAllEnvVarsSet(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 
 	// Given
 	os.Clearenv()
@@ -47,7 +48,7 @@ func TestShouldFailWhenNotAllEnvVarsSet(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 
 	// Given
 	os.Clearenv()
@@ -59,7 +60,7 @@ func TestShouldFailWhenNotAllEnvVarsSet(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 }
 
 func TestShouldFailWhenIntervalNotParsableInteger(t *testing.T) {
@@ -73,7 +74,7 @@ func TestShouldFailWhenIntervalNotParsableInteger(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 
 	// Given
 	os.Clearenv()
@@ -85,7 +86,7 @@ func TestShouldFailWhenIntervalNotParsableInteger(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 }
 
 func TestShouldReturnSensibleWhenEnvVarsSet(t *testing.T) {
@@ -111,7 +112,6 @@ func TestShouldReturnSensibleWhenTimeAndTimezoneEnvVarsSet(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("TARGET_URL", "test url")
 	os.Setenv("METHOD", "method")
-	os.Setenv("INTERVAL", "30")
 	os.Setenv("TIME", "11:00:00")
 	os.Setenv("TIMEZONE", "Europe/London")
 	// When
@@ -123,7 +123,7 @@ func TestShouldReturnSensibleWhenTimeAndTimezoneEnvVarsSet(t *testing.T) {
 	assert.Nil(t, err1)
 	assert.Nil(t, err2)
 	assert.Equal(t, 2, len(settings), "Settings should have fetched")
-	assert.Equal(t, 30, interval, "Settings should have fetched")
+	assert.Equal(t, 0, interval, "Settings should have fetched")
 	assert.Equal(t, "method", settings["method"], "Method should be set")
 	assert.Equal(t, "test url", settings["target"], "Target should be set")
 	assert.Equal(t, expectTime, timeInput, "Time should have been set")
@@ -135,7 +135,6 @@ func TestShouldFailWhenUnparsableTimeSet(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("TARGET_URL", "test url")
 	os.Setenv("METHOD", "method")
-	os.Setenv("INTERVAL", "30")
 	os.Setenv("TIME", "unparsable")
 	os.Setenv("TIMEZONE", "Europe/London")
 	// When
@@ -145,7 +144,7 @@ func TestShouldFailWhenUnparsableTimeSet(t *testing.T) {
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
 	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 }
 
 func TestShouldFailWhenUnparsableTimezoneSet(t *testing.T) {
@@ -153,19 +152,16 @@ func TestShouldFailWhenUnparsableTimezoneSet(t *testing.T) {
 	os.Clearenv()
 	os.Setenv("TARGET_URL", "test url")
 	os.Setenv("METHOD", "method")
-	os.Setenv("INTERVAL", "30")
 	os.Setenv("TIME", "11:00:00")
 	os.Setenv("TIMEZONE", "invalid")
 	// When
 	interval, settings, timeInput, timezone, err := GetSettings()
 	// Then
-	expectTime, err1 := time.Parse("15:04:05", "11:00:00")
 	assert.NotNil(t, err)
-	assert.Nil(t, err1)
 	assert.Equal(t, 0, len(settings), "Settings should have failed to fetch")
 	assert.Equal(t, -1, interval, "Settings should have failed to fetch")
-	assert.Equal(t, expectTime, timeInput, "Time should have been default value")
-	assert.Equal(t, time.UTC, timezone, "Timezone should have been default value")
+	assert.Equal(t, time.Time{}, timeInput, "Time should have been default value")
+	assert.Equal(t, (*time.Location)(nil), timezone, "Timezone should have been default value")
 }
 
 func createServer(code int) (*httptest.Server, *http.Client) {
