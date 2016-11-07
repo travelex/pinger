@@ -63,6 +63,7 @@ func GetDurationToWait(interval int, timeToRun time.Time, timezone *time.Locatio
 func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
 	target := os.Getenv("TARGET_URL")
 	method := os.Getenv("METHOD")
+	body := os.Getenv("BODY")
 	interval, err1 := strconv.Atoi(os.Getenv("INTERVAL"))
 
 	timeToRun := time.Time{}
@@ -81,10 +82,15 @@ func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
 		return -1, map[string]string{}, timeToRun, time.UTC,
 			errors.New("Environment variables were not set or could not be parsed, returning error")
 	}
+	
+	if body == "" {
+		body = "{}"
+	}
 
 	return interval, map[string]string{
 			"target": target,
-			"method": method},
+			"method": method,
+			"body": body},
 		timeToRun,
 		loc,
 		nil
@@ -94,7 +100,7 @@ func GetSettings() (int, map[string]string, time.Time, *time.Location,  error) {
 func DoCall(client *http.Client, settings map[string]string) error {
 	log.Printf("Trying HTTP %s to %s", settings["method"], settings["target"])
 
-	req, err := http.NewRequest(settings["method"], settings["target"], strings.NewReader("{}"))
+	req, err := http.NewRequest(settings["method"], settings["target"], strings.NewReader(settings["body"]))
 	if err != nil {
 		return fmt.Errorf("Failed to create HTTP request! %s", err)
 	}

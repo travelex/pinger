@@ -12,8 +12,9 @@ Edit the Dockerfile to set the environment variables:
 
   * TARGET_URL
   * METHOD (e.g. POST)
-  * INTERVAL (in seconds)
-  * TIME (optional, e.g. 16:37:00)
+  * BODY (e.g. {})
+  * INTERVAL (in seconds, e.g. 60)
+  * TIME (optional, e.g. "16:37:00")
   * TIMEZONE (optional, e.g. Europe/London)
 
 Then run
@@ -28,8 +29,4 @@ Plug this container into your composure, with a scale factor of 1.
 
 The single instance of pinger will call out to your microservice endpoint, directed by your load-balancer to one instance of the service, which can then do whatever logic is needed to handle state-change on your 3rd party.
 
-Currently sends a body of
-
-    {}
-
-in the HTTP request (i.e. empty JSON body).
+Currently if no body is supplied an empty JSON body ```{}``` is sent.
